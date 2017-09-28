@@ -140,6 +140,9 @@ def book_order(bookId,username):
     print("0、返回上一级")
     choose = input("请选择：")
     if (choose == '1'):
+        if(int(book["num"])==0):
+            print("书籍剩余数量为0，无法购买")
+            book_order(bookId,username)
         num = checkBuyNum(book)
         submit_order(username,bookId,num)
     elif (choose == '0'):
@@ -150,7 +153,7 @@ def book_order(bookId,username):
 
 def checkBuyNum(book):
     num = input("请输入购买数量:")
-    if (re.match("[0-9]", num) and int(num) <= int(book["num"])):
+    if (re.match("[0-9]", num) and int(num) <= int(book["num"]) and int(num) != 0):
         return num
     else:
         print("购买数量有误，请重新输入")
@@ -175,6 +178,7 @@ def submit_order(username,bookId,num):
         amount = userAmount[amountId]
         if(int(amount["amount"])<priceAll):
             print("账户余额不足")
+            submit_order(username,bookId,num)
         else:
             doOrder(username,bookId,num)
             print("支付成功，购买成功，返回到书籍列表")
