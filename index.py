@@ -76,7 +76,8 @@ def checkPwd():
     rePassword = input("请再次输入密码:")
     if (password != rePassword):
         print("两次密码不一致,请重新输入")
-        checkPwd()
+        password = checkPwd()
+        return password
     else:
         return password
 
@@ -149,11 +150,13 @@ def book_order(bookId,username):
 
 def checkBuyNum(book):
     num = input("请输入购买数量:")
-    if (re.match("[^0-9]", num) and int(num) > int(book["num"])):
-        print("购买数量有误，请重新输入")
-        checkBuyNum(book)
-    else:
+    if (re.match("[0-9]", num) and int(num) <= int(book["num"])):
         return num
+    else:
+        print("购买数量有误，请重新输入")
+        num = checkBuyNum(book)
+        return num
+
 
 
 def submit_order(username,bookId,num):
@@ -177,7 +180,7 @@ def submit_order(username,bookId,num):
             print("支付成功，购买成功，返回到书籍列表")
             book_list(username)
     elif (choose == '0'):
-        book_order(book_order,username)
+        book_order(bookId,username)
     else:
         print("无效选择，请重新选择")
         submit_order(username,bookId,num)
@@ -186,7 +189,7 @@ def doOrder(username,bookId,num):
     book = books[(int(bookId) - 1)]
     priceAll = int(int(num) * int(book["price"]))
     book["num"] = int(int(book["num"])-int(num))
-    books[int(bookId)] = book
+    books[(int(bookId) - 1)] = book
     amountId = getAmountByUser(username)
     amount = userAmount[amountId]
     amount["amount"] = int(int(amount["amount"])-priceAll)
@@ -199,16 +202,25 @@ def doOrder(username,bookId,num):
 
 def amount_manage(username):
     print("*********余额*********")
+    print("1、修改余额")
     print("0、退出")
     amountId = getAmountByUser(username)
     amount = userAmount[amountId]
     print("余额:%s"%amount["amount"])
     choose = input("请选择：")
-    if (choose == '0'):
+    if (choose == '1'):
+        amount_num = input("请输入新的余额:")
+        new_amount = {"username":username,"amount":amount_num}
+        userAmount[amountId] = new_amount
+        print("修改成功")
+        amount_manage(username)
+    elif (choose == '0'):
         main_index(username)
     else:
         print("无效选择，请重新选择")
         amount_manage(username)
+
+
 
 def getAmountByUser(username):
     for i,amount in enumerate(userAmount):
@@ -285,7 +297,8 @@ def checkPrice():
         return price
     else:
         print("价格格式不正确，请重新输入")
-        checkPrice()
+        price = checkPrice()
+        return price
 
 def checkBookNum():
     num = input("请输入书籍数量:")
@@ -293,7 +306,8 @@ def checkBookNum():
         return num
     else:
         print("数量格式不正确，请重新输入")
-        checkBookNum()
+        num = checkBookNum()
+        return num
 
 def add_book(username):
     print("************新增书籍*************")
